@@ -1,9 +1,11 @@
 package org.example;
 
+import java.io.IOException;
+
 import static spark.Spark.*;
 
 
-public class Main {
+public class LogRoundRobin {
     public static void main(String[] args) {
         port(getPort());
         staticFiles.location("/public");
@@ -20,13 +22,8 @@ public class Main {
         return 4567;
     }
 
-    private static String logMessage(String val){
-        return """
-               {
-               "m1":"mensaj1",
-               "m2":"mensaj2",
-               "m3":"mensaj3"
-               }
-               """;
+    private static String logMessage(String val) throws IOException {
+        //implement here the roundrobin logic
+        return HttpRemoteCaller.remoteLogCall("http://localhost:4568/logservice?message=" + val);
     }
 }
