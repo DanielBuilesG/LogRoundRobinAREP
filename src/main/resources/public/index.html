@@ -1,31 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Form Example</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente de Logs</title>
 </head>
 <body>
-<h1>Form with GET</h1>
-<form action="/log">
-    <label for="name">Name:</label><br>
-    <input type="text" id="message" name="message" value="Message"><br><br>
-    <input type="button" value="Submit" onclick="loadGetMsg()">
-</form>
-<div id="getrespmsg"></div>
+<h1>Cliente de Logs</h1>
+<label for="logInput">Ingrese un log:</label>
+<input type="text" id="logInput" placeholder="Escriba su log aquí">
+<button id="fetchButton">Enviar</button>
+<h2>Lista de Logs:</h2>
+<ul id="logList"></ul>
 
 <script>
-            function loadGetMsg() {
-                let nameVar = document.getElementById("message").value;
-                const xhttp = new XMLHttpRequest();
-                xhttp.onload = function() {
-                    document.getElementById("getrespmsg").innerHTML =
-                    this.responseText;
-                }
-                xhttp.open("GET", "/log?value="+nameVar);
-                xhttp.send();
-            }
-        </script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const logInput = document.getElementById("logInput");
+        const fetchButton = document.getElementById("fetchButton");
+        const logList = document.getElementById("logList");
 
+        fetchButton.addEventListener("click", () => {
+            const logValue = logInput.value;
+
+            if (logValue !== "") {
+                const url = `/roundrobin?log=${encodeURIComponent(logValue)}`;
+
+                fetch(url)
+                    .then(response => response.text())
+                    .then(data => {
+                        logList.innerHTML = "";
+                        const logEntries = data.split(", ");
+                        logEntries.forEach(logEntry => {
+                            const cleanLogEntry = logEntry.replace(/\[|\]/g, "");
+                            const listItem = document.createElement("li");
+                            listItem.textContent = cleanLogEntry;
+                            logList.appendChild(listItem);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error al realizar la solicitud Fetch:", error);
+                    });
+            } else {
+                alert("Por favor, ingrese un log válido.");
+            }
+        });
+    });
+</script>
 </body>
 </html>

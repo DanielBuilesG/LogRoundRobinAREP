@@ -6,12 +6,12 @@ import static spark.Spark.*;
 
 
 public class LogRoundRobin {
-    public static void main(String[] args) {
+    public static void main(String... args){
         port(getPort());
         staticFiles.location("/public");
-        get("/log", (req, res) -> {
-            String val = req.queryParams("value");
-            return logMessage(val);
+        get("/roundrobin", (req,res) -> {
+            String log = req.queryParams("log");
+            return HttpRemoteCaller.getLogs(log);
         });
     }
 
@@ -22,8 +22,4 @@ public class LogRoundRobin {
         return 4567;
     }
 
-    private static String logMessage(String val) throws IOException {
-        //implement here the roundrobin logic
-        return HttpRemoteCaller.remoteLogCall("http://localhost:4568/logservice?message=" + val);
-    }
 }
